@@ -1,0 +1,68 @@
+-- 🔊 Script: passos, pulo e queda personalizados (versão final)
+-- Coloque dentro de Workspace
+
+local workspace = game:GetService("Workspace")
+
+-- volumes
+local FOOTSTEP_VOLUME = 0.3
+local JUMP_VOLUME = 0.1
+local LAND_VOLUME = 0.15
+
+-- nomes dos sons padrões do personagem
+local soundNames = {"Running", "Jumping", "Landing", "Climbing"}
+
+-- IDs personalizados
+local FOOTSTEP_ID = "rbxassetid://73623962649821"   -- 👣 Passos-normal
+local JUMP_ID     = "rbxassetid://124750537408062"  -- 🦘 Pulo-normal
+local LAND_ID     = "rbxassetid://83323788759262"   -- ⬇️ Som de queda
+
+local function lockVolume(sound, volume)
+	sound:GetPropertyChangedSignal("Volume"):Connect(function()
+		if sound.Volume ~= volume then
+			sound.Volume = volume
+		end
+	end)
+end
+
+local function setCustomSounds(character)
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	for _, name in ipairs(soundNames) do
+		local sound = root:FindFirstChild(name)
+		if sound and sound:IsA("Sound") then
+			
+			if name == "Running" then
+				sound.SoundId = FOOTSTEP_ID
+				sound.Volume = FOOTSTEP_VOLUME
+				lockVolume(sound, FOOTSTEP_VOLUME)
+
+			elseif name == "Jumping" then
+				sound.SoundId = JUMP_ID
+				sound.Volume = JUMP_VOLUME
+				lockVolume(sound, JUMP_VOLUME)
+
+			elseif name == "Landing" then
+				sound.SoundId = LAND_ID
+				sound.Volume = LAND_VOLUME
+				lockVolume(sound, LAND_VOLUME)
+			end
+		end
+	end
+end
+
+-- aplica aos personagens já presentes
+for _, child in ipairs(workspace:GetChildren()) do
+	if child:FindFirstChild("HumanoidRootPart") then
+		setCustomSounds(child)
+	end
+end
+
+-- aplica aos novos personagens
+workspace.ChildAdded:Connect(function(child)
+	if child:WaitForChild("HumanoidRootPart", 3) then
+		setCustomSounds(child)
+	end
+end)
+
+print("✅ Passos, pulo e som de queda personalizados aplicados com sucesso!")
